@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>메뉴 관리</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* 상단 네비게이션 */
+    .top-nav {
+      display: flex;
+      justify-content: center; /* 가로 중앙 정렬 */
+      align-items: center; /* 세로 중앙 정렬 */
+      padding: 10px;
+      background-color: #f8f9fa;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .nav-button {
+      padding: 8px 16px;
+      margin-right: 10px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .nav-button.active {
+      background-color: #212529;
+      color: white;
+      border-radius: 4px;
+    }
+
+    /* 탭 네비게이션 */
+    .tab-container {
+      display: flex;
+      justify-content: center; /* 가로 중앙 정렬 */
+      align-items: center; /* 세로 중앙 정렬 */
+      padding: 10px;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      justify-content: center; /* 가로 중앙 정렬 */
+    }
+
+    .tab-button {
+      padding: 8px 16px;
+      border: 1px solid #dee2e6;
+      background: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .tab-button.active {
+      background-color: #f8f9fa;
+      border-color: #212529;
+    }
+
+    .tab-button.add {
+      width: 40px;
+      padding: 8px 0;
+    }
+
+    /* 메인 컨텐츠 영역 */
+    .content-container {
+      display: flex;
+      padding: 20px;
+    }
+
+    /* 메뉴 그리드 */
+    .menu-container {
+      width: 50%;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .menu-item {
+      aspect-ratio: 1;
+      background-color: white;
+      border: 1px solid #dee2e6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .menu-item:hover {
+      border-color: #212529;
+    }
+
+    .menu-item.add {
+      font-size: 24px;
+    }
+
+    /* 검색 결과 영역 */
+    .search-container {
+      width: 50%;
+      padding: 20px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      margin-bottom: 20px;
+    }
+
+    .search-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .search-item {
+      aspect-ratio: 1;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+    }
+
+    /* 네비게이터 슬라이드 */
+    .navigator {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 300px;
+      height: 100%;
+      background-color: #fff;
+      box-shadow: -3px 0 5px rgba(0, 0, 0, 0.1);
+      transition: right 0.3s ease;
+      padding: 20px;
+      z-index: 1000;
+    }
+
+    .navigator.open {
+      right: 0;
+    }
+
+    .navigator h2 {
+      margin-bottom: 20px;
+    }
+
+    .navigator input {
+      width: 90%;
+      margin-bottom: 15px;
+      padding: 10px;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+    }
+
+    .navigator button {
+      width: 100%;
+      padding: 10px;
+      background-color: #212529;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 5px;
+    }
+
+    .navigator button:hover {
+      background-color: #343a40;
+    }
+
+    .preview-image {
+      width: 100%;
+      height: auto;
+      margin-top: 20px;
+      border-radius: 4px;
+    }
+
+    #categoryAction {
+      display: none;
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f8f9fa;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      text-align: center; /* 텍스트 중앙 정렬 */
+    }
+
+    #categoryAction button {
+      width: 15%;
+      padding: 10px;
+      background-color: #212529;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      margin-bottom: 5px;
+      display: inline-block; /* 버튼들이 수평으로 나열되도록 설정 */
+    }
+
+    #categoryAction button:hover {
+      background-color: #343a40;
+    }
+
+    #categoryAction {
+      display: flex;
+      justify-content: center; /* 버튼들을 수평 중앙 정렬 */
+      gap: 10px; /* 버튼 사이에 간격 추가 */
+    }
+  </style>
+</head>
+<body>
+
+<!-- 상단 네비게이션 -->
+<div class="top-nav">
+  <button class="nav-button" onclick="window.location.href='/orders'">주문관리</button>
+  <button class="nav-button active" onclick="window.location.href='/menu/menumanagement'">메뉴관리</button>
+</div>
+
+<!-- 탭 네비게이션 -->
+<div class="tab-container">
+  <div class="tabs">
+    <button class="tab-button add">+</button>
+  </div>
+</div>
+
+<!-- 탭 네비게이션  수정 삭제 -->
+<div id="categoryAction" style="display: none;">
+  <button id="saveCategoryBtn">수정</button>
+  <button id="deleteCategoryBtn">삭제</button>
+</div>
+
+
+<!-- 메인 컨텐츠 -->
+<div class="content-container">
+  <!-- 메뉴 그리드 -->
+  <div class="menu-container">
+    <div class="menu-item add" id="addMenuButton">+</div>
+  </div>
+</div>
+
+<!-- 네비게이터 -->
+<div id="navigator" class="navigator">
+  <h2>메뉴 정보</h2>
+  <input type="hidden" id="menuId">
+  <input type="text" id="menuName" placeholder="메뉴명을 입력하세요" />
+  <input type="text" id="menuPrice" placeholder="가격을 입력하세요" />
+  <input type="file" id="menuImage" onchange="previewImage(event)" />
+  <button onclick="updateMenu()">수정</button>
+  <button onclick="deleteMenu()">삭제</button>
+  <button onclick="$('#navigator').removeClass('open')">취소</button>
+  <img id="imagePreview" class="preview-image" src="" alt="미리보기 이미지" style="display:none;" />
+</div>
+
+<script>
+  $(document).ready(function() {
+    loadCategories();
+
+    // + 버튼에 대한 클릭 이벤트 리스너 추가
+    $('.menu-item.add').on('click', function() {
+        clearNavigator();
+        $('#navigator h2').text('새 메뉴 추가');
+        $('#navigator').find('button').hide();
+        $('#navigator').append('<button onclick="saveMenu()" id="saveBtn">저장</button>');
+        $('#navigator').append('<button onclick="closeNavigator()" id="cancelBtn">취소</button>');
+        $('#navigator').addClass('open');
+    });
+});
+
+// 카테고리 로드 함수
+function loadCategories() {
+    $.ajax({
+        url: '/api/categories',
+        method: 'GET',
+        success: function(categories) {
+            $('.tabs .tab-button.add').siblings().remove();
+            categories.forEach(category => {
+                const tabButton = $(`<button class="tab-button" data-category-id="${category.categoryId}">${category.name}</button>`);
+                tabButton.on('click', function() {
+                    $(this).addClass('active').siblings().removeClass('active');
+                    loadMenusForCategory(category.name);
+                });
+                tabButton.on('dblclick', function() {
+                    openCategoryActions(category);
+                });
+                $('.tab-button.add').before(tabButton);
+            });
+        },
+        error: function(xhr) {
+            console.error('카테고리 불러오기 실패:', xhr.status, xhr.responseText);
+            alert('카테고리를 불러오는 데 실패했습니다.');
+        }
+    });
+}
+
+// 카테고리 수정 및 삭제 버튼 열기
+function openCategoryActions(category) {
+    $('#categoryAction').show();
+
+    $('#saveCategoryBtn').off('click').on('click', function() {
+        const updatedName = prompt('수정할 카테고리 이름을 입력하세요:', category.name);
+        if (updatedName && updatedName !== category.name) {
+            $.ajax({
+                url: `/api/categories/${category.categoryId}`,
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify({ name: updatedName }),
+                success: function() {
+                    alert('카테고리가 수정되었습니다.');
+                    $('#categoryAction').hide();
+                    loadCategories();
+                },
+                error: function(xhr) {
+                    alert(`카테고리 수정에 실패했습니다.`);
+                }
+            });
+        }
+    });
+
+    $('#deleteCategoryBtn').off('click').on('click', function() {
+        if (confirm(`${category.name} 카테고리를 삭제하시겠습니까?`)) {
+            $.ajax({
+                url: `/api/categories/${category.categoryId}`,
+                method: 'DELETE',
+                success: function() {
+                    alert('카테고리가 삭제되었습니다.');
+                    $('#categoryAction').hide();
+                    loadCategories();
+                },
+                error: function(xhr) {
+                    alert(`카테고리 삭제에 실패했습니다.`);
+                }
+            });
+        }
+    });
+}
+
+// 카테고리 추가
+$('.tab-button.add').click(function() {
+    const categoryName = prompt('새로운 카테고리 이름을 입력하세요:');
+    if (categoryName) {
+        $.ajax({
+            url: '/api/categories',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ name: categoryName }),
+            success: function(response) {
+                loadCategories();
+            },
+            error: function() {
+                alert('카테고리 추가에 실패했습니다.');
+            }
+        });
+    }
+});
+
+// 메뉴 저장
+function saveMenu() {
+    const menuData = new FormData();
+    menuData.append('name', $('#menuName').val());
+    menuData.append('price', $('#menuPrice').val());
+    menuData.append('categoryName', $('.tab-button.active').text());
+    if ($('#menuImage')[0].files[0]) {
+        menuData.append('image', $('#menuImage')[0].files[0]);
+    }
+
+    $.ajax({
+        url: '/api/menu/save',
+        method: 'POST',
+        data: menuData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            alert('메뉴가 저장되었습니다.');
+            closeNavigator();
+            loadMenusForCategory($('.tab-button.active').text());
+        },
+        error: function(xhr) {
+            alert('메뉴 저장에 실패했습니다.');
+        }
+    });
+}
+
+// 메뉴 수정
+function updateMenu() {
+    const menuId = $('#menuId').val();
+    const menuData = new FormData();
+    menuData.append('name', $('#menuName').val());
+    menuData.append('price', $('#menuPrice').val());
+    menuData.append('categoryName', $('.tab-button.active').text());
+    if ($('#menuImage')[0].files[0]) {
+        menuData.append('image', $('#menuImage')[0].files[0]);
+    }
+
+    $.ajax({
+        url: `/api/menu/${menuId}`,
+        method: 'PUT',
+        data: menuData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            alert('메뉴가 수정되었습니다.');
+            closeNavigator();
+            loadMenusForCategory($('.tab-button.active').text());
+        },
+        error: function(xhr) {
+            alert('메뉴 수정에 실패했습니다.');
+        }
+    });
+}
+
+// 메뉴 삭제
+function deleteMenu() {
+    const menuId = $('#menuId').val();
+    if (!menuId) {
+        alert('삭제할 메뉴를 선택해주세요.');
+        return;
+    }
+
+    if (confirm('정말 삭제하시겠습니까?')) {
+        $.ajax({
+            url: `/api/menu/${menuId}`,
+            method: 'DELETE',
+            success: function(response) {
+                alert('메뉴가 삭제되었습니다.');
+                closeNavigator();
+                loadMenusForCategory($('.tab-button.active').text());
+            },
+            error: function(xhr) {
+                alert('메뉴 삭제에 실패했습니다.');
+            }
+        });
+    }
+}
+
+// 카테고리별 메뉴 로드
+function loadMenusForCategory(categoryName) {
+    $.ajax({
+        url: `/api/menu/list?category=${categoryName}`,
+        method: 'GET',
+        success: function(menus) {
+            const menuContainer = $('.menu-container');
+            menuContainer.html('<div class="menu-item add">+</div>');
+            menus.forEach(menu => {
+                const menuItem = $('<div>')
+                    .addClass('menu-item')
+                    .text(menu.name)
+                    .on('click', function() {
+                        openMenuDetail(menu.menuId);
+                    });
+                menuContainer.append(menuItem);
+            });
+
+            // + 버튼에 대한 이벤트 리스너 다시 추가
+            $('.menu-item.add').on('click', function() {
+                clearNavigator();
+                $('#navigator h2').text('새 메뉴 추가');
+                $('#navigator').find('button').hide();
+                $('#navigator').append('<button onclick="saveMenu()" id="saveBtn">저장</button>');
+                $('#navigator').append('<button onclick="closeNavigator()" id="cancelBtn">취소</button>');
+                $('#navigator').addClass('open');
+            });
+        },
+        error: function(xhr, status, errorMessage) {  // 매개변수 추가
+            // 오류 메시지 포맷팅 수정
+            console.error('메뉴 불러오기 실패 - 상태:', xhr.status);
+            console.error('오류 메시지:', errorMessage);
+        }
+    });
+}
+
+// 메뉴 상세 정보 열기
+function openMenuDetail(menuId) {
+    $.ajax({
+        url: `/api/menu/${menuId}`,
+        method: 'GET',
+        success: function(menu) {
+            $('#menuId').val(menu.menuId);
+            $('#menuName').val(menu.name);
+            $('#menuPrice').val(menu.price);
+            if (menu.imageUrl) {
+                $('#imagePreview').attr('src', menu.imageUrl).show();
+            }
+            $('#navigator h2').text('메뉴 정보');
+            $('#navigator').find('button').show();
+            $('#saveBtn, #cancelBtn').remove();
+            $('#navigator').addClass('open');
+        },
+        error: function(xhr) {
+            alert('메뉴 정보를 불러오는데 실패했습니다.');
+        }
+    });
+}
+
+// 네비게이터 초기화
+function clearNavigator() {
+    $('#menuId').val('');
+    $('#menuName').val('');
+    $('#menuPrice').val('');
+    $('#menuImage').val('');
+    $('#imagePreview').hide();
+}
+
+// 네비게이터 닫기
+function closeNavigator() {
+    $('#navigator').removeClass('open');
+    $('#saveBtn, #cancelBtn').remove();
+    $('#navigator').find('button').show();
+    $('#navigator h2').text('메뉴 정보');
+}
+
+// 이미지 미리보기
+function previewImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            $('#imagePreview').attr('src', e.target.result).show();
+        }
+        reader.readAsDataURL(file);
+    }
+}
+</script>
+
+</body>
+</html>

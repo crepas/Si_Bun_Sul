@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>주문 시스템</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            background-image: url('/img/main.jpg');
+            background-size: cover;  /* 화면에 맞게 이미지 크기 조절 */
+            background-position: center;  /* 이미지 중앙 정렬 */
+            background-repeat: no-repeat;  /* 이미지 반복 없음 */
+            position: relative;
+        }
+
+        /* 배경 오버레이 (이미지 위에 반투명한 검은색 레이어) */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);  /* 반투명한 검은색 */
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            padding: 20px;
+            min-height: calc(100vh - 200px);
+        }
+
+        .button {
+            width: 200px;
+            height: 200px;
+            border: none;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-decoration: none;
+            backdrop-filter: blur(5px);
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .user-button {
+            color: white;
+        }
+
+        .admin-button {
+            color: white;
+        }
+
+        .icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>주문 시스템</h1>
+</div>
+<div class="container">
+    <a href="/menu" class="button user-button">
+        <div class="icon">👤</div>
+        사용자
+    </a>
+    <a href="/login" class="button admin-button">
+        <div class="icon">⚙️</div>
+        관리자
+    </a>
+</div>
+</body>
+</html>

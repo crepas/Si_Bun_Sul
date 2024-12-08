@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <style>
+      body {
+          font-family: Arial, sans-serif;
+          text-align: center;
+          margin: 50px;
+      }
+      input, button {
+          display: block;
+          margin: 10px auto;
+          padding: 10px;
+          width: 300px;
+          font-size: 16px;
+      }
+      button {
+          background-color: #f2f2f2;
+          border: none;
+          cursor: pointer;
+      }
+
+  </style>
+</head>
+<body>
+<h1>회원가입</h1>
+<form action="/join" method="post">
+
+    <input type="text" name="username" placeholder="아이디" required>
+    <input type="password" name="password" placeholder="비밀번호" required>
+    <input type="text" name="name" placeholder="이름" required>
+    <input type="email" name="email" placeholder="이메일" required>
+    <input type="tel" name="phoneNumber" placeholder="전화번호" required>
+
+    <button type="submit">가입하기</button>
+</form>
+</body>
+</html>

@@ -1,22 +1,50 @@
 package com.sys.OrderSystem.Entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.OneToMany;
-import org.springframework.data.annotation.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.Set;
-
+@Entity
+@Table(name = "category")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int categoryId;
+    private Integer categoryId;
+
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "category")
-    private Set<Menu> menus;
+    @JsonIgnore
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    private List<Menu> menus = new ArrayList<>();
 
+    // Getters and Setters
+    public Integer getCategoryId() {
+        return categoryId;
+    }
 
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public List<Menu> getMenus() {
+        return menus;
+    }
+
+    public void setMenus(List<Menu> menus) {
+        this.menus = menus;
+    }
 }
+
+
